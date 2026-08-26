@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZeroSus — Fake Internship Offer Detector</title>
+  <meta name="description" content="ZeroSus: AI-powered fake internship offer detector. Protect yourself from scams with live NLP analysis, fraud scoring, and instant Placement Cell alerts." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     LOGIN PAGE
+══════════════════════════════════════════════════════════ -->
+<div id="loginPage" class="login-page">
+  <div class="login-bg-glow"></div>
+
+  <div class="login-container">
+    <!-- Brand -->
+    <div class="login-brand">
+      <div class="login-logo">🛡️</div>
+      <h1 class="login-app-name">ZeroSus</h1>
+      <p class="login-tagline">AI-Powered Fake Internship Offer Detector</p>
+      <div class="login-badge">AI + Cyber Defense</div>
+    </div>
+
+    <!-- Role selector -->
+    <div class="login-roles">
+      <div class="login-role-card" id="roleStudent" onclick="selectRole('student')">
+        <div class="role-icon">🎓</div>
+        <div class="role-label">Student / Parent</div>
+        <div class="role-desc">Analyse an offer you received and check if it's real</div>
+      </div>
+      <div class="login-role-card" id="rolePlacement" onclick="selectRole('placement')">
+        <div class="role-icon">🏫</div>
+        <div class="role-label">Placement Cell</div>
+        <div class="role-desc">Review student reports and broadcast verified warnings</div>
+      </div>
+    </div>
+
+    <!-- Login Form -->
+    <div class="login-form-wrap" id="loginFormWrap">
+      <div class="login-form-header" id="loginFormHeader"></div>
+
+      <div class="form-group">
+        <label class="form-label" for="loginUsername">Username</label>
+        <input type="text" id="loginUsername" placeholder="Enter your username" autocomplete="off" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password" />
+      </div>
+
+      <div class="login-error" id="loginError"></div>
+
+      <button class="btn-login" id="btnLogin" onclick="doLogin()">
+        🔓 Sign In
+      </button>
+
+      <div class="login-hint" id="loginHint"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN APP (shown after login)
+══════════════════════════════════════════════════════════ -->
+<div id="appPage" style="display:none;">
+<div class="app-wrapper">
+
+  <!-- ── Navbar ── -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="brand-icon">🛡️</div>
+      <div class="brand-text">
+        <h1>ZeroSus</h1>
+      </div>
+    </div>
+    <div class="navbar-actions">
+      <div class="user-pill" id="userPill">
+        <span id="userPillIcon">🎓</span>
+        <span id="userPillName">Student</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+        <span class="toggle-icon">🌙</span> Dark
+      </button>
+      <button class="btn-cell-login" id="btnLogout" onclick="logoutToLogin()">
+        🚪 Log Out
+      </button>
+    </div>
+  </nav>
+
+
+  <!-- ══════════════════════════════════════
+       STUDENT VIEW
+  ══════════════════════════════════════ -->
+  <div id="mainView" style="display:none;">
+
+    <section class="hero">
+      <div class="hero-badge">AI + Cyber Defense &nbsp;·&nbsp; NLP Fraud Detection</div>
+      <h2>
+        Is your internship offer<br>
+        <span class="gradient-text">real or a scam?</span>
+      </h2>
+      <p>
+        Paste the offer you received — from email or SMS — and ZeroSus runs
+        7 live checks in seconds to tell you exactly how risky it is, in plain language.
+      </p>
+    </section>
+
+    <div class="card" id="inputCard">
+      <div class="card-header">
+        <div class="card-icon blue">📋</div>
+        <div>
+          <div class="card-title">Analyse an Offer</div>
+          <div class="card-subtitle">Works for Email offers and SMS / Text messages</div>
+        </div>
+      </div>
+
+      <div class="form-label"><span>📡</span> Which channel did this offer arrive on?</div>
+      <div class="channel-selector">
+        <button class="channel-btn email active" id="btn-email" onclick="selectChannel('email')">
+          <span class="ch-emoji">📧</span> Email
+        </button>
+        <button class="channel-btn sms" id="btn-sms" onclick="selectChannel('sms')">
+          <span class="ch-emoji">💬</span> SMS / Text Message
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="offerText">
+          <span>📝</span> Offer Message Text
+          <span class="label-required">Required</span>
+        </label>
+        <textarea id="offerText" placeholder="Paste the full internship or job offer text here…
+
+Example: 'Congratulations! You have been selected for an internship at XYZ Solutions Pvt Ltd. No interview required — you are directly selected. Please pay ₹2,000 as a refundable security deposit and share your Aadhaar card copy to confirm your seat. Offer valid only today!'"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="senderField">
+          <span>🔎</span> Sender (Email address or Phone number)
+          <span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:4px;">Optional but recommended</span>
+        </label>
+        <input type="text" id="senderField" placeholder="e.g. careers@xyz-corp.com  or  +91-98XXXXXXXX  or  XY-CORPHR" />
+        <div class="sender-hint" id="senderHint">💡 The sender's email domain or phone number is itself checked for legitimacy</div>
+      </div>
+
+      <button class="btn-analyze" id="btnAnalyze" onclick="analyzeOffer()">
+        <span class="btn-icon">🔍</span>
+        <span class="btn-text">Analyse This Offer</span>
+      </button>
+      <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px;">⌨️ Shortcut: <strong>Ctrl + Enter</strong></div>
+      <button class="btn-reset" id="btnReset" onclick="resetApp()">↺ &nbsp; Check Another Offer</button>
+    </div>
+
+    <div class="insufficient-panel" id="insufficientPanel"></div>
+    <div class="checklist-panel" id="checklistPanel"></div>
+    <div class="verdict-panel" id="verdictPanel"></div>
+
+    <div class="how-it-works">
+      <div class="how-title">How ZeroSus works</div>
+      <div class="how-subtitle">7 checks run live — every flag is explained, not hidden behind a black-box answer</div>
+      <div class="how-steps">
+        <div class="how-step">
+          <div class="how-step-num">1</div>
+          <span class="how-step-icon">📡</span>
+          <div class="how-step-label">Intake</div>
+          <div class="how-step-desc">Paste the offer + sender from email or SMS</div>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">2</div>
+          <span class="how-step-icon">🔍</span>
+          <div class="how-step-label">Live Checks</div>
+          <div class="how-step-desc">7 checks — domain, sender, fees, ID, urgency…</div>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">3</div>
+          <span class="how-step-icon">⚖️</span>
+          <div class="how-step-label">Scoring</div>
+          <div class="how-step-desc">Weighted rules → Safe / Suspicious / High Risk</div>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">4</div>
+          <span class="how-step-icon">📢</span>
+          <div class="how-step-label">Escalate</div>
+          <div class="how-step-desc">High Risk? Report to Placement Cell instantly</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end #mainView -->
+
+
+  <!-- ══════════════════════════════════════
+       PLACEMENT CELL VIEW
+  ══════════════════════════════════════ -->
+  <div id="cellDashboard" style="display:none;">
+
+    <div class="cell-header">
+      <div class="cell-title-wrap">
+        <h2>🏫 Placement Cell Dashboard</h2>
+        <p>Analyse offers directly, review student reports, and broadcast verified warnings</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span class="cell-badge">👩‍💼 Mrs. Deepa Kulkarni · Head, T&amp;P Cell</span>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="cell-tabs">
+      <button class="cell-tab active" id="tabAnalyse" onclick="switchCellTab('analyse')">
+        🔍 Analyse an Offer
+      </button>
+      <button class="cell-tab" id="tabReports" onclick="switchCellTab('reports')">
+        📬 Student Reports
+        <span class="tab-badge" id="reportsBadge" style="display:none;"></span>
+      </button>
+    </div>
+
+    <!-- Tab: Analyse -->
+    <div id="cellAnalyseTab">
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-header">
+          <div class="card-icon cyan">🔍</div>
+          <div>
+            <div class="card-title">Analyse a Suspicious Offer</div>
+            <div class="card-subtitle">Paste any offer text to run the full fraud detection — then broadcast directly if confirmed High Risk</div>
+          </div>
+        </div>
+
+        <div class="form-label"><span>📡</span> Channel</div>
+        <div class="channel-selector">
+          <button class="channel-btn email active" id="cell-btn-email" onclick="selectCellChannel('email')">
+            <span class="ch-emoji">📧</span> Email
+          </button>
+          <button class="channel-btn sms" id="cell-btn-sms" onclick="selectCellChannel('sms')">
+            <span class="ch-emoji">💬</span> SMS / Text Message
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="cellOfferText">
+            <span>📝</span> Offer Message Text <span class="label-required">Required</span>
+          </label>
+          <textarea id="cellOfferText" placeholder="Paste the suspicious offer text here to analyse it directly…"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="cellSenderField">
+            <span>🔎</span> Sender (Email or Phone)
+          </label>
+          <input type="text" id="cellSenderField" placeholder="e.g. careers@xyz-corp.com or +91-98XXXXXXXX" />
+          <div class="sender-hint" id="cellSenderHint">💡 Sender legitimacy is checked automatically</div>
+        </div>
+
+        <button class="btn-analyze" id="cellBtnAnalyze" onclick="analyseCellOffer()">
+          <span class="btn-icon">🔍</span>
+          <span class="btn-text">Analyse This Offer</span>
+        </button>
+        <button class="btn-reset" id="cellBtnReset" onclick="resetCellAnalyse()" style="display:none;margin-top:10px;">↺ &nbsp; Analyse Another Offer</button>
+      </div>
+
+      <div class="insufficient-panel" id="cellInsufficientPanel"></div>
+      <div class="checklist-panel" id="cellChecklistPanel"></div>
+      <div class="verdict-panel" id="cellVerdictPanel"></div>
+    </div>
+
+    <!-- Tab: Reports -->
+    <div id="cellReportsTab" style="display:none;">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value red" id="statPending">0</div>
+          <div class="stat-label">Pending Review</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value amber" id="statBroadcast">0</div>
+          <div class="stat-label">Broadcasts Sent</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value green" id="statDismissed">0</div>
+          <div class="stat-label">Dismissed</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">📬</div>
+          <div>
+            <div class="card-title">Student Fraud Reports</div>
+            <div class="card-subtitle">High Risk reports submitted by students — review and broadcast if confirmed</div>
+          </div>
+        </div>
+        <div id="reportQueueContainer">
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <p>No fraud reports yet</p>
+            <span>Student-submitted reports will appear here for your review.</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="broadcastHistorySection" style="display:none;margin-top:24px;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon purple">📢</div>
+            <div>
+              <div class="card-title">Broadcast History</div>
+              <div class="card-subtitle">Alerts sent to all students</div>
+            </div>
+          </div>
+          <div class="broadcast-history" id="broadcastHistoryList"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;padding:14px 18px;background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.18);border-radius:12px;font-size:12px;color:var(--text-muted);line-height:1.6;">
+        🔒 <strong style="color:var(--text-secondary)">Human-in-the-loop (NFR6):</strong>
+        Student reports are never auto-broadcast. Every report is reviewed by the Placement Cell Head before a warning is sent.
+      </div>
+    </div>
+
+  </div><!-- end #cellDashboard -->
+
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <strong>ZeroSus</strong> &nbsp;·&nbsp;
+    TCS Tech Day @ D J Sanghvi College of Engineering &nbsp;·&nbsp;
+    AI + Cyber Defense &nbsp;·&nbsp; v2.0
+    <br><br>
+    ⚠️ All sample offer data is mock/simulated — no real names, brands, or Aadhaar numbers are used.
+  </footer>
+
+</div><!-- end .app-wrapper -->
+</div><!-- end #appPage -->
+
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+
+<!-- Report to Placement Cell Modal -->
+<div class="modal-overlay" id="reportModal" onclick="if(event.target===this) closeReportModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeReportModal()">✕</button>
+    <div class="modal-icon">🚨</div>
+    <div class="modal-title">Report to Placement Cell</div>
+    <div class="modal-desc">
+      This packages all detected red flags — company name, sender, domain, and every fraud indicator — into a structured complaint for the Placement Cell to review.<br><br>
+      <strong>Your identity is not shared</strong> in any broadcast alert (FR18).
+    </div>
+    <div class="modal-input-wrap">
+      <label class="modal-label" for="reportStudentId">Your Student ID (optional — never broadcast)</label>
+      <input type="text" id="reportStudentId" placeholder="e.g. 2022BECS001 — or leave blank" />
+    </div>
+    <button class="btn-modal-submit" onclick="submitReport()">
+      📤 Submit Report to Placement Cell
+    </button>
+  </div>
+</div>
+
+<!-- Broadcast Confirm Modal (Placement Cell direct broadcast) -->
+<div class="modal-overlay" id="broadcastConfirmModal" onclick="if(event.target===this) closeBroadcastConfirmModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeBroadcastConfirmModal()">✕</button>
+    <div class="modal-icon">📢</div>
+    <div class="modal-title">Broadcast Warning?</div>
+    <div class="modal-desc" id="broadcastConfirmDesc">
+      You are about to send an institution-wide alert about this offer. This cannot be undone.
+    </div>
+    <div class="modal-input-wrap">
+      <label class="modal-label">Alert Preview</label>
+      <div id="broadcastPreviewText" style="background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:10px;padding:14px;font-size:13px;color:var(--text-secondary);line-height:1.6;"></div>
+    </div>
+    <button class="btn-modal-submit" style="background:linear-gradient(135deg,#f59e0b,#d97706);" onclick="confirmCellBroadcast()">
+      📢 Broadcast to All Students
+    </button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     BROADCAST TOAST
+══════════════════════════════════════ -->
+<div class="broadcast-toast" id="broadcastToast">
+  <span class="toast-icon">📢</span>
+  <div class="toast-content">
+    <div class="toast-label">Institution-Wide Alert Broadcast</div>
+    <div class="toast-text" id="toastText"></div>
+  </div>
+  <button class="toast-close" onclick="closeBroadcastToast()">✕</button>
+</div>
+
+
+<script src="config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
